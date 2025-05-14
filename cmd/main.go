@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	mux := app.SetMux()
+	h := app.SetHandler()
 
-	log.Println("Starting listening...")
-	if err := http.ListenAndServe(domain.URLDomain+":"+domain.Port, mux); err != nil {
+	log.Printf("Starting listening on port %s", domain.Port)
+	if err := http.ListenAndServe(domain.URLDomain+":"+domain.Port, h); err != nil {
 		log.Fatalf("Server listening error: %s", err.Error())
 	}
 }

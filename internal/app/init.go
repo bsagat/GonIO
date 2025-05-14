@@ -25,6 +25,7 @@ func init() {
 func CheckPort() error {
 	domain.Port = os.Getenv("PORT")
 	domain.URLDomain = os.Getenv("DOMAIN")
+	domain.BucketsPath = os.Getenv("BUCKETPATH")
 
 	if len(domain.URLDomain) == 0 {
 		return domain.ErrEmptyDomain
@@ -38,6 +39,10 @@ func CheckPort() error {
 
 	if portInt < 1100 || portInt > 65535 {
 		return domain.ErrInvalidPortStr
+	}
+
+	if domain.BucketsPath == "" {
+		domain.BucketsPath = "data"
 	}
 
 	return nil
