@@ -96,7 +96,7 @@ func CheckEmpty(pathToCSV string) (bool, error) {
 		return false, err
 	}
 
-	if len(records) == 1 {
+	if len(records) <= 1 {
 		return true, nil
 	}
 	return false, nil

@@ -3,6 +3,7 @@ package app
 import (
 	"GonIO/internal/domain"
 	envzilla "GonIO/pkg/EnvZilla"
+	csvparser "GonIO/pkg/myCSV"
 	"encoding/csv"
 	"log"
 	"log/slog"
@@ -27,7 +28,7 @@ func init() {
 	CheckDir()
 	CreateMetaData()
 
-	log.Println("Its all OK...")
+	log.Println("Everything is OK...")
 }
 
 func ParseConfig() error {
@@ -60,9 +61,18 @@ func CreateMetaData() {
 	data := []string{"Name", "CreationTime", "LastModifiedTime", "Status"}
 	domain.BucketsMetaPath = domain.BucketsPath + "/buckets.csv"
 
+	empty, err := csvparser.CheckEmpty(domain.BucketsMetaPath)
+	if err != nil {
+		log.Fatal("Failed to read bucket metadata : ", err.Error())
+	}
+
+	if !empty {
+		return
+	}
+
 	file, err := os.OpenFile(domain.BucketsMetaPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o666)
 	if err != nil {
-		log.Fatal("Bucket metadata create error: ", err.Error())
+		log.Fatal("Failed to create bucket metadata: ", err.Error())
 	}
 	defer file.Close()
 
@@ -71,7 +81,7 @@ func CreateMetaData() {
 
 	err = writer.Write(data)
 	if err != nil {
-		log.Fatal("Csv metadata write error: ", err.Error())
+		log.Fatal("Failed to write CSV metadata: ", err.Error())
 	}
 }
 

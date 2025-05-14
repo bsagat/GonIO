@@ -21,7 +21,7 @@ func (h *BucketHandler) BucketListsHandler(w http.ResponseWriter, r *http.Reques
 func (h *BucketHandler) CreateBucketHandler(w http.ResponseWriter, r *http.Request) {
 	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		log.Printf("Bucket handler error: %s", domain.ErrEmptyBucketName.Error())
+		log.Printf("Failed to get path value: %s", domain.ErrEmptyBucketName.Error())
 		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}
@@ -32,7 +32,7 @@ func (h *BucketHandler) CreateBucketHandler(w http.ResponseWriter, r *http.Reque
 func (h *BucketHandler) DeleteBucketHandler(w http.ResponseWriter, r *http.Request) {
 	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		log.Printf("Bucket handler error: %s", domain.ErrEmptyBucketName.Error())
+		log.Printf("Failed to get path value: %s", domain.ErrEmptyBucketName.Error())
 		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}

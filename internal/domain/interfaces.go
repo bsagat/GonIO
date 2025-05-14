@@ -1,6 +1,8 @@
 package domain
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type BucketDal interface {
 	GetBucketList() ([]Bucket, error)
@@ -10,7 +12,11 @@ type BucketDal interface {
 }
 
 type ObjectDal interface {
-	RetrieveObject() error
+	IsObjectExist(path, name string) (bool, error)
+	List_Object(bucketname string) (ObjectsList, error)
+	UploadObject(bucketname, objectname string, r *http.Request) error
+	RetrieveObject(bucketname, objectname string, w http.ResponseWriter) error
+	DeleteObject(bucketname, objectname string) error
 }
 
 type BucketService interface {
@@ -20,5 +26,8 @@ type BucketService interface {
 }
 
 type ObjectService interface {
-	ObjectList(w http.ResponseWriter)
+	ObjectList(w http.ResponseWriter, bucketname string)
+	RetrieveObject(w http.ResponseWriter, bucketname, objectname string)
+	UploadObject(w http.ResponseWriter, r *http.Request, bucketname, objectname string)
+	DeleteObject(w http.ResponseWriter, r *http.Request, bucketname, objectname string)
 }

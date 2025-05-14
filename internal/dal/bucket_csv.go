@@ -18,8 +18,8 @@ func NewBucketXMLRepo() *BucketCSV {
 	return &BucketCSV{BucketMetaPath: domain.BucketsMetaPath}
 }
 
-func (xml BucketCSV) GetBucketList() ([]domain.Bucket, error) {
-	file, err := os.Open(xml.BucketMetaPath)
+func (repo BucketCSV) GetBucketList() ([]domain.Bucket, error) {
+	file, err := os.Open(repo.BucketMetaPath)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (xml BucketCSV) GetBucketList() ([]domain.Bucket, error) {
 	return buckets, nil
 }
 
-func (xml BucketCSV) IsUniqueBucket(bucketName string) (bool, error) {
+func (repo BucketCSV) IsUniqueBucket(bucketName string) (bool, error) {
 	metaFile, err := os.OpenFile(domain.BucketsMetaPath, os.O_RDWR, 0o666)
 	if err != nil {
 		return false, err
@@ -76,7 +76,7 @@ func (xml BucketCSV) IsUniqueBucket(bucketName string) (bool, error) {
 	return true, nil
 }
 
-func (xml BucketCSV) CreateBucket(bucketname string) error {
+func (repo BucketCSV) CreateBucket(bucketname string) error {
 	// Bucket directory creating
 	err := os.Mkdir(domain.BucketsPath+"/"+bucketname, 5580)
 	date := time.Now()
@@ -113,7 +113,7 @@ func (xml BucketCSV) CreateBucket(bucketname string) error {
 	return nil
 }
 
-func (xml BucketCSV) DeleteBucket(bucketName string) error {
+func (repo BucketCSV) DeleteBucket(bucketName string) error {
 	empty, err := csvparser.CheckEmpty(domain.BucketsPath + "/" + bucketName + "/objects.csv")
 	if err != nil {
 		return err

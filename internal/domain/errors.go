@@ -6,6 +6,8 @@ var (
 	ErrInvalidPortStr   = errors.New("port number is invalid, must be in range between 1100 and 65535")
 	ErrEmptyDomain      = errors.New("domain config is empty")
 	ErrEmptyBucketName  = errors.New("bucket name is empty")
+	ErrEmptyObjectName  = errors.New("object name is empty")
+	ErrObjectIsNotExist = errors.New("object is not exist")
 	ErrBucketIsNotExist = errors.New("bucket is not exist")
 	ErrBucketIsNotEmpty = errors.New("bucket must be empty")
 	ErrNameHyphen       = errors.New("name must not begin or end with a hyphen")
