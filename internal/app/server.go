@@ -10,7 +10,7 @@ import (
 func SetHandler() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	objectDal := dal.NewObjectXMLRepo()
+	objectDal := dal.NewObjectCSVRepo()
 	objectServ := service.NewObjectService(*objectDal)
 	objectHandler := handlers.NewObjectHandler(objectServ)
 

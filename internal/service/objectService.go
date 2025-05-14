@@ -5,14 +5,16 @@ import (
 	"net/http"
 )
 
-type ObjectService struct {
+type ObjectServiceImp struct {
 	dal domain.ObjectDal
 }
 
-func NewObjectService(dal domain.ObjectDal) *ObjectService {
-	return &ObjectService{dal: dal}
+var _ domain.ObjectService = (*ObjectServiceImp)(nil)
+
+func NewObjectService(dal domain.ObjectDal) *ObjectServiceImp {
+	return &ObjectServiceImp{dal: dal}
 }
 
-func (serv ObjectService) ObjectList(w http.ResponseWriter) {
+func (serv ObjectServiceImp) ObjectList(w http.ResponseWriter) {
 
 }

@@ -3,9 +3,11 @@ package app
 import (
 	"GonIO/internal/domain"
 	envzilla "GonIO/pkg/EnvZilla"
+	"encoding/csv"
 	"log"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -15,14 +17,20 @@ func init() {
 		log.Fatalf("Configs loading error: %s", err.Error())
 	}
 
-	if err := CheckPort(); err != nil {
+	if err := ParseConfig(); err != nil {
 		log.Fatalf("Config validation error: %s", err.Error())
 	}
-
 	log.Println("Config loading finished...")
+
+	log.Println("Metadata file check...")
+
+	CheckDir()
+	CreateMetaData()
+
+	log.Println("Its all OK...")
 }
 
-func CheckPort() error {
+func ParseConfig() error {
 	domain.Port = os.Getenv("PORT")
 	domain.URLDomain = os.Getenv("DOMAIN")
 	domain.BucketsPath = os.Getenv("BUCKETPATH")
@@ -46,4 +54,42 @@ func CheckPort() error {
 	}
 
 	return nil
+}
+
+func CreateMetaData() {
+	data := []string{"Name", "CreationTime", "LastModifiedTime", "Status"}
+	domain.BucketsMetaPath = domain.BucketsPath + "/buckets.csv"
+
+	file, err := os.OpenFile(domain.BucketsMetaPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o666)
+	if err != nil {
+		log.Fatal("Bucket metadata create error: ", err.Error())
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Csv metadata write error: ", err.Error())
+	}
+}
+
+func CheckDir() {
+	absPath, err := filepath.Abs(domain.BucketsPath)
+	if err != nil {
+		log.Fatal("Error resolving absolute path:", err)
+	}
+
+	_, err = os.Stat(absPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err := os.MkdirAll(absPath, os.ModePerm)
+			if err != nil {
+				log.Fatal("Error create directory :", err)
+			}
+		} else {
+			log.Fatal("Error checking path:", err)
+		}
+	}
 }

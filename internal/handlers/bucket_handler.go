@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"GonIO/internal/domain"
-	xmlsender "GonIO/pkg/xmlMsgSender"
+	"log"
 	"net/http"
 )
 
@@ -19,13 +19,23 @@ func (h *BucketHandler) BucketListsHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *BucketHandler) CreateBucketHandler(w http.ResponseWriter, r *http.Request) {
-	bucketName := r.FormValue("BucketName")
+	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		xmlsender.Sender(w, http.StatusBadRequest, domain.ErrEmptyBucketName.Error())
+		log.Printf("Bucket handler error: %s", domain.ErrEmptyBucketName.Error())
+		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}
+
+	h.serv.CreateBucket(w, bucketName)
 }
 
 func (h *BucketHandler) DeleteBucketHandler(w http.ResponseWriter, r *http.Request) {
+	bucketName := r.PathValue("BucketName")
+	if bucketName == "" {
+		log.Printf("Bucket handler error: %s", domain.ErrEmptyBucketName.Error())
+		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
+		return
+	}
 
+	h.serv.DeleteBucket(w, bucketName)
 }

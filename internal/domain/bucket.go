@@ -1,6 +1,9 @@
 package domain
 
-import "encoding/xml"
+var (
+	DeletionMark = "Marked for deletion"
+	ActiveMark   = "Active"
+)
 
 type Bucket struct {
 	Name             string `xml:"Name"`
@@ -10,7 +13,6 @@ type Bucket struct {
 }
 
 // Buckets list for XML response
-type ListBucketResponse struct {
-	XMLName xml.Name `xml:"ListBuckets"`
-	Buckets []Bucket `xml:"Bucket"`
+type BucketList struct {
+	Buckets []Bucket `xml:"Buckets"`
 }
