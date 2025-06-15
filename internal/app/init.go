@@ -33,10 +33,10 @@ func init() {
 
 func ParseConfig() error {
 	domain.Port = os.Getenv("PORT")
-	domain.URLDomain = os.Getenv("DOMAIN")
+	domain.Host = os.Getenv("HOST")
 	domain.BucketsPath = os.Getenv("BUCKETPATH")
 
-	if len(domain.URLDomain) == 0 {
+	if len(domain.Host) == 0 {
 		return domain.ErrEmptyDomain
 	}
 

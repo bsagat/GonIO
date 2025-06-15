@@ -64,7 +64,16 @@ Objects are the actual files stored inside buckets, along with metadata like con
 
 ## 🛠️ Usage
 
-Start the server using:
+1) Setup Config file:
+
+```
+PORT=9090 # Default port number
+HOST=localhost # Default Domain number
+BUCKETPATH=data # Buckets location path
+```
+
+2) Start the server using:
 
 ```bash
 $ ./gonIO 
+
