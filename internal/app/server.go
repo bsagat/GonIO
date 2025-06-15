@@ -18,6 +18,10 @@ func SetHandler() *http.ServeMux {
 	bucketServ := service.NewBucketService(*bucketDal)
 	bucketHandler := handlers.NewBucketHandler(bucketServ)
 
+	healthHandler := handlers.NewHealthHandler()
+
+	mux.HandleFunc("GET /PING", healthHandler.Ping) // Healthcheck
+
 	mux.HandleFunc("GET /", bucketHandler.BucketListsHandler)                 // Bucket list
 	mux.HandleFunc("PUT /{BucketName}", bucketHandler.CreateBucketHandler)    // Create bucket
 	mux.HandleFunc("DELETE /{BucketName}", bucketHandler.DeleteBucketHandler) // Delete bucket
