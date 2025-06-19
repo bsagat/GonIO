@@ -6,6 +6,7 @@ import (
 	csvparser "GonIO/pkg/myCSV"
 	"encoding/csv"
 	"errors"
+	"flag"
 	"log"
 	"log/slog"
 	"os"
@@ -15,27 +16,56 @@ import (
 
 func init() {
 	slog.Info("Starting config loading...")
-	if err := envzilla.Loader("configs/.env"); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			slog.Warn("Config file is not exist...")
-			slog.Info("Start reading cmd arguments")
-
-		} else {
-			log.Fatal("Configs loading error: ", err)
-		}
+	if err := LoadConfig(); err != nil {
+		log.Fatal("Configs loading error: ", err)
 	}
 
 	if err := ParseConfig(); err != nil {
-		log.Fatal("Config validation error: ", err)
+		log.Fatal("Config parsing error: ", err)
 	}
 	slog.Info("Config loading finished...")
 
-	slog.Info("Metadata file check...")
+	slog.Info("STORAGE: Metadata file check...")
 
 	CheckDir()
 	CreateMetaData()
 
 	slog.Info("Everything is OK...")
+}
+
+func LoadConfig() error {
+	slog.Info("Start reading config file...")
+	err := envzilla.Loader("configs/.env")
+	if errors.Is(err, os.ErrNotExist) {
+		slog.Warn("Config file is not exist...")
+	} else {
+		return nil
+	}
+
+	slog.Info("Set cmd arguments...")
+	portFlag := flag.String("port", "9090", "Default port number")
+	hostFlag := flag.String("host", "localhost", "Default server host")
+	bucketsPathFlag := flag.String("dir", "data", "Default buckets path")
+	flag.Parse()
+
+	flags := map[string]*string{
+		"PORT":       portFlag,
+		"HOST":       hostFlag,
+		"BUCKETPATH": bucketsPathFlag,
+	}
+
+	for key, flag := range flags {
+		if err := os.Setenv(key, *flag); err != nil {
+			slog.Error("Failed to set flag arguments: ", "error", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func ParseFlags() {
+	flag.Parse()
 }
 
 func ParseConfig() error {
