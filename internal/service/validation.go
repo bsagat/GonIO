@@ -33,6 +33,12 @@ func CheckName(s string) (int, error) {
 		return 0, domain.ErrNameHyphen
 	}
 	for i := 0; i < len(s); i++ {
+		if s[i] == '_' {
+			continue
+		}
+		if s[i] == '`' {
+			continue
+		}
 		if s[i] <= 44 {
 			return 0, errors.New("name error character: " + string(s[i]))
 		}

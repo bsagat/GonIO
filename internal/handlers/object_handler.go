@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"GonIO/internal/domain"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -17,7 +17,7 @@ func NewObjectHandler(serv domain.ObjectService) *ObjectHandler {
 func (h *ObjectHandler) GetObjectList(w http.ResponseWriter, r *http.Request) {
 	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyBucketName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyBucketName)
 		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}
@@ -28,14 +28,14 @@ func (h *ObjectHandler) GetObjectList(w http.ResponseWriter, r *http.Request) {
 func (h *ObjectHandler) RetrieveObject(w http.ResponseWriter, r *http.Request) {
 	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyBucketName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyBucketName)
 		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}
 
 	objectName := r.PathValue("ObjectKey")
 	if objectName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyObjectName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyObjectName)
 		http.Error(w, domain.ErrEmptyObjectName.Error(), http.StatusBadRequest)
 		return
 	}
@@ -46,14 +46,14 @@ func (h *ObjectHandler) RetrieveObject(w http.ResponseWriter, r *http.Request) {
 func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyBucketName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyBucketName)
 		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}
 
 	objectName := r.PathValue("ObjectKey")
 	if objectName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyObjectName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyObjectName)
 		http.Error(w, domain.ErrEmptyObjectName.Error(), http.StatusBadRequest)
 		return
 	}
@@ -64,14 +64,14 @@ func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
 	bucketName := r.PathValue("BucketName")
 	if bucketName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyBucketName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyBucketName)
 		http.Error(w, domain.ErrEmptyBucketName.Error(), http.StatusBadRequest)
 		return
 	}
 
 	objectName := r.PathValue("ObjectKey")
 	if objectName == "" {
-		log.Printf("Failed to get path value: %s", domain.ErrEmptyObjectName.Error())
+		slog.Error("Failed to get path value: ", "error", domain.ErrEmptyObjectName)
 		http.Error(w, domain.ErrEmptyObjectName.Error(), http.StatusBadRequest)
 		return
 	}

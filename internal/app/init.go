@@ -5,6 +5,7 @@ import (
 	envzilla "GonIO/pkg/EnvZilla"
 	csvparser "GonIO/pkg/myCSV"
 	"encoding/csv"
+	"errors"
 	"log"
 	"log/slog"
 	"os"
@@ -13,22 +14,28 @@ import (
 )
 
 func init() {
-	log.Println("Starting config loading...")
+	slog.Info("Starting config loading...")
 	if err := envzilla.Loader("configs/.env"); err != nil {
-		log.Fatalf("Configs loading error: %s", err.Error())
+		if errors.Is(err, os.ErrNotExist) {
+			slog.Warn("Config file is not exist...")
+			slog.Info("Start reading cmd arguments")
+
+		} else {
+			log.Fatal("Configs loading error: ", err)
+		}
 	}
 
 	if err := ParseConfig(); err != nil {
-		log.Fatalf("Config validation error: %s", err.Error())
+		log.Fatal("Config validation error: ", err)
 	}
-	log.Println("Config loading finished...")
+	slog.Info("Config loading finished...")
 
-	log.Println("Metadata file check...")
+	slog.Info("Metadata file check...")
 
 	CheckDir()
 	CreateMetaData()
 
-	log.Println("Everything is OK...")
+	slog.Info("Everything is OK...")
 }
 
 func ParseConfig() error {
@@ -42,7 +49,7 @@ func ParseConfig() error {
 
 	portInt, err := strconv.Atoi(domain.Port)
 	if err != nil {
-		slog.Debug("Port convert error: ", "portNum", portInt, "Errmessage", err.Error())
+		slog.Debug("Port convert error: ", "portNum", portInt, "error", "invalid port number")
 		return domain.ErrInvalidPortStr
 	}
 

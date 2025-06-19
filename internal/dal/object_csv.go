@@ -55,7 +55,7 @@ func (repo ObjectCSV) List_Object(bucketname string) (domain.ObjectsList, error)
 }
 
 func (repo ObjectCSV) UploadObject(bucketname, objectname string, r *http.Request) error {
-	file, err := os.OpenFile(domain.BucketsPath+"/"+bucketname+"/"+objectname, os.O_CREATE, 0o666)
+	file, err := os.OpenFile(domain.BucketsPath+"/"+bucketname+"/"+objectname, os.O_CREATE|os.O_WRONLY, 0o666)
 	if err != nil {
 		return err
 	}
