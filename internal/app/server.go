@@ -4,11 +4,17 @@ import (
 	"GonIO/internal/dal"
 	"GonIO/internal/handlers"
 	"GonIO/internal/service"
+	"log"
+	"log/slog"
 	"net/http"
+	"os"
+
+	httpswagger "github.com/swaggo/http-swagger"
 )
 
 func SetHandler() *http.ServeMux {
 	mux := http.NewServeMux()
+	SetSwagger(mux)
 
 	objectDal := dal.NewObjectCSVRepo()
 	objectServ := service.NewObjectService(*objectDal)
@@ -32,4 +38,23 @@ func SetHandler() *http.ServeMux {
 	mux.HandleFunc("DELETE /{BucketName}/{ObjectKey}", objectHandler.DeleteObject) // Delete an object
 
 	return mux
+}
+
+func SetSwagger(mux *http.ServeMux) {
+	swaggerBytes, err := os.ReadFile("docs/swagger.json")
+	if err != nil {
+		log.Fatal("Failed to read swagger file: ", err)
+	}
+
+	mux.HandleFunc("GET /api/bro/docs/swagger/", httpswagger.Handler(
+		httpswagger.URL("/docs/swagger.json"),
+	))
+
+	mux.HandleFunc("GET  /docs/swagger.json", func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Content-Type", "application/json")
+		if _, err := writer.Write(swaggerBytes); err != nil {
+			slog.Error("Failed to send swagger file: ", "error", err)
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
+	})
 }
