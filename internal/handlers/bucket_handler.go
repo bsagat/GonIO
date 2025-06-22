@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"GonIO/internal/domain"
+	xmlsender "GonIO/pkg/xmlMsgSender"
+	"fmt"
 	"log/slog"
 	"net/http"
 )
@@ -15,7 +17,18 @@ func NewBucketHandler(serv domain.BucketService) *BucketHandler {
 }
 
 func (h *BucketHandler) BucketListsHandler(w http.ResponseWriter, r *http.Request) {
-	h.serv.BucketList(w)
+	list, err := h.serv.BucketList()
+	if err != nil {
+		slog.Error("Failed to get bucket list: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err = xmlsender.SendBucketList(w, list); err != nil {
+		slog.Error("Failed to send bucket list: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *BucketHandler) CreateBucketHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +39,18 @@ func (h *BucketHandler) CreateBucketHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	h.serv.CreateBucket(w, bucketName)
+	code, err := h.serv.CreateBucket(bucketName)
+	if err != nil {
+		slog.Error("Failed to create bucket: ", "error", err)
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	if err = xmlsender.SendMessage(w, code, fmt.Sprintf("bucket with name %s created succesfully", bucketName)); err != nil {
+		slog.Error("Failed to send xml message: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *BucketHandler) DeleteBucketHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,5 +61,16 @@ func (h *BucketHandler) DeleteBucketHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	h.serv.DeleteBucket(w, bucketName)
+	code, err := h.serv.DeleteBucket(bucketName)
+	if err != nil {
+		slog.Error("Failed to delete bucket: ", "error", err)
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	if err = xmlsender.SendMessage(w, code, fmt.Sprintf("bucket with name %s deleted succesfully", bucketName)); err != nil {
+		slog.Error("Failed to send xml message: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

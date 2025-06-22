@@ -13,21 +13,21 @@ type BucketDal interface {
 
 type ObjectDal interface {
 	IsObjectExist(path, name string) (bool, error)
-	List_Object(bucketname string) (ObjectsList, error)
+	List_Object(bucketname string) ([]Object, error)
 	UploadObject(bucketname, objectname string, r *http.Request) error
 	RetrieveObject(bucketname, objectname string, w http.ResponseWriter) error
 	DeleteObject(bucketname, objectname string) error
 }
 
 type BucketService interface {
-	BucketList(w http.ResponseWriter)
-	CreateBucket(w http.ResponseWriter, bucketName string)
-	DeleteBucket(w http.ResponseWriter, bucketName string)
+	BucketList() ([]Bucket, error)
+	CreateBucket(bucketName string) (int, error)
+	DeleteBucket(bucketName string) (int, error)
 }
 
 type ObjectService interface {
-	ObjectList(w http.ResponseWriter, bucketname string)
-	RetrieveObject(w http.ResponseWriter, bucketname, objectname string)
-	UploadObject(w http.ResponseWriter, r *http.Request, bucketname, objectname string)
-	DeleteObject(w http.ResponseWriter, r *http.Request, bucketname, objectname string)
+	ObjectList(bucketname string) ([]Object, int, error)
+	RetrieveObject(w http.ResponseWriter, bucketname, objectname string) (int, error)
+	UploadObject(r *http.Request, bucketname, objectname string) (int, error)
+	DeleteObject(bucketname, objectname string) (int, error)
 }

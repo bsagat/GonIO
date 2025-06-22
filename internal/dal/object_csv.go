@@ -20,18 +20,17 @@ func NewObjectCSVRepo() *ObjectCSV {
 
 var _ domain.ObjectDal = (*ObjectCSV)(nil)
 
-func (repo ObjectCSV) List_Object(bucketname string) (domain.ObjectsList, error) {
-	empty := domain.ObjectsList{}
+func (repo ObjectCSV) List_Object(bucketname string) ([]domain.Object, error) {
 	metafile, err := os.OpenFile(domain.BucketsPath+"/"+bucketname+"/objects.csv", os.O_RDWR, 0o666)
 	if err != nil {
-		return empty, err
+		return nil, err
 	}
 	defer metafile.Close()
 
 	reader := csv.NewReader(metafile)
 	records, err := reader.ReadAll()
 	if err != nil {
-		return empty, err
+		return nil, err
 	}
 
 	var Objects []domain.Object
@@ -50,12 +49,13 @@ func (repo ObjectCSV) List_Object(bucketname string) (domain.ObjectsList, error)
 		})
 	}
 
-	objectlist := domain.ObjectsList{Objects: Objects}
-	return objectlist, nil
+	return Objects, nil
 }
 
+// Uploads object from request body
+// using io.Copy for *http.Request
 func (repo ObjectCSV) UploadObject(bucketname, objectname string, r *http.Request) error {
-	file, err := os.OpenFile(domain.BucketsPath+"/"+bucketname+"/"+objectname, os.O_WRONLY, 0o666)
+	file, err := os.OpenFile(domain.BucketsPath+"/"+bucketname+"/"+objectname, os.O_CREATE|os.O_WRONLY, 0o666)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,6 @@ func (repo ObjectCSV) UploadObject(bucketname, objectname string, r *http.Reques
 
 	filetype := r.Header.Get("Content-Type")
 	data := []string{objectname, strconv.Itoa(int(r.ContentLength)), filetype, date.Format(time.ANSIC)}
-	defer file.Close()
 
 	if err = csvparser.WriteCSV(Metafile, data); err != nil {
 		return err
@@ -87,6 +86,8 @@ func (repo ObjectCSV) UploadObject(bucketname, objectname string, r *http.Reques
 	return nil
 }
 
+// Retrieves object from http.ResponseWriter
+// Then saves it locally
 func (repo ObjectCSV) RetrieveObject(bucketname, objectname string, w http.ResponseWriter) error {
 	objectFile, err := os.Open(domain.BucketsPath + "/" + bucketname + "/" + objectname)
 	if err != nil {

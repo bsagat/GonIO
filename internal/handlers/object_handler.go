@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"GonIO/internal/domain"
+	xmlsender "GonIO/pkg/xmlMsgSender"
+	"fmt"
 	"log/slog"
 	"net/http"
 )
@@ -22,7 +24,18 @@ func (h *ObjectHandler) GetObjectList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.serv.ObjectList(w, bucketName)
+	objectList, code, err := h.serv.ObjectList(bucketName)
+	if err != nil {
+		slog.Error("Failed to get object list: ", "error", err)
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	if err = xmlsender.SendObjectList(w, objectList); err != nil {
+		slog.Error("Failed to send object list: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *ObjectHandler) RetrieveObject(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +53,12 @@ func (h *ObjectHandler) RetrieveObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.serv.RetrieveObject(w, bucketName, objectName)
+	code, err := h.serv.RetrieveObject(w, bucketName, objectName)
+	if err != nil {
+		slog.Error("Failed to retrieve object: ", "bucket", bucketName, "object", objectName, "error", err)
+		http.Error(w, err.Error(), code)
+		return
+	}
 }
 
 func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +76,18 @@ func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.serv.UploadObject(w, r, bucketName, objectName)
+	code, err := h.serv.UploadObject(r, bucketName, objectName)
+	if err != nil {
+		slog.Error("Failed to upload object: ", "bucket", bucketName, "object", objectName, "error", err)
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	if err = xmlsender.SendMessage(w, code, fmt.Sprintf("object with name %s created succesfully", objectName)); err != nil {
+		slog.Error("Failed to send xml message: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
@@ -76,5 +105,16 @@ func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.serv.DeleteObject(w, r, bucketName, objectName)
+	code, err := h.serv.DeleteObject(bucketName, objectName)
+	if err != nil {
+		slog.Error("Failed to delete object: ", "bucket", bucketName, "object", objectName, "error", err)
+		http.Error(w, err.Error(), code)
+		return
+	}
+
+	if err = xmlsender.SendMessage(w, code, fmt.Sprintf("object with name %s deleted succesfully", objectName)); err != nil {
+		slog.Error("Failed to send xml message: ", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
