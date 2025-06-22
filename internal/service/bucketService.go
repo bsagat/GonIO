@@ -16,55 +16,52 @@ func NewBucketService(dal domain.BucketDal) *BucketServiceImp {
 	return &BucketServiceImp{dal: dal}
 }
 
-// Bucket List retrieve logic
-func (serv BucketServiceImp) BucketList() ([]domain.Bucket, error) {
-	list, err := serv.dal.GetBucketList()
+func (s BucketServiceImp) BucketList() ([]domain.Bucket, error) {
+	buckets, err := s.dal.GetBucketList()
 	if err != nil {
-		slog.Error("Failed to get bucket list: ", "error", err)
+		slog.Error("Could not retrieve bucket list", "error", err)
 		return nil, err
 	}
-	return list, nil
+	return buckets, nil
 }
 
-// Bucket create logic (validation)
-func (serv BucketServiceImp) CreateBucket(bucketName string) (int, error) {
-	unique, err := serv.dal.IsUniqueBucket(bucketName)
+func (s BucketServiceImp) CreateBucket(bucketName string) (int, error) {
+	isUnique, err := s.dal.IsUniqueBucket(bucketName)
 	if err != nil {
-		slog.Error("Failed to check if bucket name is unique: ", "error", err)
+		slog.Error("Failed to check bucket name uniqueness", "error", err)
 		return http.StatusInternalServerError, err
 	}
-	if !unique {
-		slog.Info("Bucket name is not unique")
+	if !isUnique {
+		slog.Info("Bucket name already exists", "bucket", bucketName)
 		return http.StatusConflict, domain.ErrNotUniqueName
 	}
 
-	if err = Validate(bucketName); err != nil {
-		slog.Error("Bucket name validation error: ", "error", err)
+	if err := Validate(bucketName); err != nil {
+		slog.Error("Invalid bucket name", "bucket", bucketName, "error", err)
 		return http.StatusBadRequest, err
 	}
 
-	if err = serv.dal.CreateBucket(bucketName); err != nil {
-		slog.Error("Failed to create bucket: ", "error", err)
+	if err := s.dal.CreateBucket(bucketName); err != nil {
+		slog.Error("Failed to create bucket", "bucket", bucketName, "error", err)
 		return http.StatusInternalServerError, err
 	}
 
 	return http.StatusCreated, nil
 }
 
-// Bucket Delete logic
-func (serv BucketServiceImp) DeleteBucket(bucketName string) (int, error) {
-	unique, err := serv.dal.IsUniqueBucket(bucketName)
+func (s BucketServiceImp) DeleteBucket(bucketName string) (int, error) {
+	isUnique, err := s.dal.IsUniqueBucket(bucketName)
 	if err != nil {
-		slog.Error("Failed to check if bucket name is unique: ", "error", err)
+		slog.Error("Failed to check bucket existence", "bucket", bucketName, "error", err)
 		return http.StatusInternalServerError, err
 	}
-	if unique {
-		slog.Info("Bucket is not exist")
+	if isUnique {
+		slog.Info("Bucket does not exist", "bucket", bucketName)
 		return http.StatusNotFound, domain.ErrBucketIsNotExist
 	}
 
-	if err = serv.dal.DeleteBucket(bucketName); err != nil {
-		slog.Error("Failed to delete bucket: ", "error", err)
+	if err := s.dal.DeleteBucket(bucketName); err != nil {
+		slog.Error("Failed to delete bucket", "bucket", bucketName, "error", err)
 		return http.StatusInternalServerError, err
 	}
 

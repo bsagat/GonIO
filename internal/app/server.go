@@ -16,14 +16,14 @@ func SetHandler() *http.ServeMux {
 	mux := http.NewServeMux()
 	SetSwagger(mux)
 
-	objectDal := dal.NewObjectCSVRepo()
-	objectServ := service.NewObjectService(*objectDal)
-	objectHandler := handlers.NewObjectHandler(objectServ)
-
 	bucketDal := dal.NewBucketXMLRepo()
-	bucketServ := service.NewBucketService(*bucketDal)
-	bucketHandler := handlers.NewBucketHandler(bucketServ)
+	objectDal := dal.NewObjectCSVRepo()
 
+	objectServ := service.NewObjectService(*objectDal, bucketDal)
+	bucketServ := service.NewBucketService(*bucketDal)
+
+	objectHandler := handlers.NewObjectHandler(objectServ)
+	bucketHandler := handlers.NewBucketHandler(bucketServ)
 	healthHandler := handlers.NewHealthHandler()
 
 	mux.HandleFunc("GET /PING", healthHandler.Ping) // Healthcheck
@@ -32,6 +32,7 @@ func SetHandler() *http.ServeMux {
 	mux.HandleFunc("PUT /{BucketName}", bucketHandler.CreateBucketHandler)    // Create bucket
 	mux.HandleFunc("DELETE /{BucketName}", bucketHandler.DeleteBucketHandler) // Delete bucket
 
+	mux.HandleFunc("PUT /jar/{BucketName}", objectHandler.ObjectJarHandler)        // Upload an object jar
 	mux.HandleFunc("GET /{BucketName}", objectHandler.GetObjectList)               // Get object list in bucket
 	mux.HandleFunc("GET /{BucketName}/{ObjectKey}", objectHandler.RetrieveObject)  // Retrieve an object
 	mux.HandleFunc("PUT /{BucketName}/{ObjectKey}", objectHandler.UpdateObject)    // Upload an object

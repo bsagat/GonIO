@@ -64,10 +64,6 @@ func LoadConfig() error {
 	return nil
 }
 
-func ParseFlags() {
-	flag.Parse()
-}
-
 func ParseConfig() error {
 	domain.Port = os.Getenv("PORT")
 	domain.Host = os.Getenv("HOST")

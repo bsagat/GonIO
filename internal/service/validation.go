@@ -39,7 +39,13 @@ func CheckName(s string) (int, error) {
 
 		if s[i] == '.' {
 			countDots++
+			continue
 		}
+
+		if s[i] >= '0' && s[i] <= '9' {
+			continue
+		}
+
 		if s[i] >= 'A' && s[i] <= 'Z' {
 			continue
 		}

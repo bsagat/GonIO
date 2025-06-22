@@ -1,23 +1,25 @@
 package domain
 
-import (
-	"net/http"
-)
+import "io"
+
+// === DAL Interfaces ===
 
 type BucketDal interface {
 	GetBucketList() ([]Bucket, error)
 	IsUniqueBucket(bucketName string) (bool, error)
-	CreateBucket(bucketname string) error
+	CreateBucket(bucketName string) error
 	DeleteBucket(bucketName string) error
 }
 
 type ObjectDal interface {
-	IsObjectExist(path, name string) (bool, error)
-	List_Object(bucketname string) ([]Object, error)
-	UploadObject(bucketname, objectname string, r *http.Request) error
-	RetrieveObject(bucketname, objectname string, w http.ResponseWriter) error
-	DeleteObject(bucketname, objectname string) error
+	IsObjectExist(bucketName, objectName string) (bool, error)
+	ListObjects(bucketName string) ([]Object, error)
+	UploadObject(bucketName, objectName string, data io.ReadCloser, contentLen int64, contentType string) error
+	RetrieveObject(bucketName, objectName string) (io.ReadCloser, error)
+	DeleteObject(bucketName, objectName string) error
 }
+
+// === Service Interfaces ===
 
 type BucketService interface {
 	BucketList() ([]Bucket, error)
@@ -26,8 +28,9 @@ type BucketService interface {
 }
 
 type ObjectService interface {
-	ObjectList(bucketname string) ([]Object, int, error)
-	RetrieveObject(w http.ResponseWriter, bucketname, objectname string) (int, error)
-	UploadObject(r *http.Request, bucketname, objectname string) (int, error)
-	DeleteObject(bucketname, objectname string) (int, error)
+	ObjectList(bucketName string) ([]Object, int, error)
+	RetrieveObject(bucketName, objectName string) (io.ReadCloser, int, error)
+	UploadObject(bucketName, objectName, contentType string, data io.ReadCloser, contentLen int64) (int, error)
+	UploadObjectJar(bucketName string, reqBody io.ReadCloser) (int, error)
+	DeleteObject(bucketName, objectName string) (int, error)
 }
