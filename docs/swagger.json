@@ -37,7 +37,7 @@
         }
       }
     },
-    "/": {
+    "/buckets": {
       "get": {
         "summary": "List Buckets",
         "description": "Retrieves a list of all existing buckets.",
@@ -118,12 +118,11 @@
         }
       }
     },
-    "/{BucketName}": {
+    "/objects/{BucketName}": {
       "get": {
         "summary": "List Objects in Bucket",
         "description": "Returns all objects contained within the specified bucket.",
         "tags": [
-          "Bucket",
           "Object"
         ],
         "operationId": "ListObjects",
@@ -226,7 +225,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/buckets/{BucketName}": {
       "put": {
         "summary": "Create Bucket",
         "description": "Creates a new bucket with the specified name.",
@@ -376,7 +377,7 @@
         }
       }
     },
-    "/{BucketName}/{ObjectKey}": {
+    "/objects/{BucketName}/{ObjectKey}": {
       "get": {
         "summary": "Retrieve Object",
         "description": "Retrieves a specific object from the given bucket.",
@@ -574,6 +575,81 @@
         "responses": {
           "200": {
             "description": "Object deleted successfully.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "description": "Generic response message structure",
+                  "xml": {
+                    "name": "Response"
+                  },
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Operation result message",
+                      "example": "bucket created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bucket or object name is missing or invalid.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "bucket name is empty"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bucket or object not found.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "bucket does not exist"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected server error.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects/{BucketName}/jar": {
+      "get": {
+        "summary": "Upload Object jar",
+        "operationId": "UploadObjectJar",
+        "tags": [
+          "Object"
+        ],
+        "parameters": [
+          {
+            "name": "BucketName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "kairatNurtasPhotos"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Object jar uploaded successfully.",
             "content": {
               "application/xml": {
                 "schema": {
