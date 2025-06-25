@@ -63,9 +63,9 @@
 
 Allows uploading a ZIP archive with images into a bucket.
 
-### 📤 Upload ZIP
-- **Method:** `POST`
-- **Endpoint:** `/{bucket-name}/upload-zip`
+### 📤 Object Jar (ZIP)
+- **Method:** `PUT`
+- **Endpoint:** `/objects/{bucket-name}/jar`
 - **Headers:**
   - `Content-Type`: `application/zip`
 - **Body:** A ZIP file containing image files
