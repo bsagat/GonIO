@@ -21,17 +21,17 @@
 
 ### ✅ Create a Bucket
 - **Method:** `PUT`
-- **Endpoint:** `/{bucket-name}`
+- **Endpoint:** `/buckets/{bucket-name}`
 - **Body:** empty
 - **Constraints:** bucket name must be 3–63 characters, lowercase, may include numbers, hyphens, and dots
 
 ### 📄 List All Buckets
 - **Method:** `GET`
-- **Endpoint:** `/`
+- **Endpoint:** `/buckets`
 
 ### ❌ Delete a Bucket
 - **Method:** `DELETE`
-- **Endpoint:** `/{bucket-name}`
+- **Endpoint:** `/buckets/{bucket-name}`
 
 ---
 
@@ -39,7 +39,7 @@
 
 ### 📤 Upload an Object
 - **Method:** `PUT`
-- **Endpoint:** `/{bucket-name}/{object-key}`
+- **Endpoint:** `/objects/{bucket-name}/{object-key}`
 - **Body:** binary data of the file
 - **Headers:**
   - `Content-Type`: MIME type (e.g. `image/png`)
@@ -47,15 +47,15 @@
 
 ### 📄 List All Objects in a Bucket
 - **Method:** `GET`
-- **Endpoint:** `/{bucket-name}`
+- **Endpoint:** `/objects/{bucket-name}`
 
 ### 📥 Retrieve an Object
 - **Method:** `GET`
-- **Endpoint:** `/{bucket-name}/{object-key}`
+- **Endpoint:** `/objects/{bucket-name}/{object-key}`
 
 ### 🗑️ Delete an Object
 - **Method:** `DELETE`
-- **Endpoint:** `/{bucket-name}/{object-key}`
+- **Endpoint:** `/objects/{bucket-name}/{object-key}`
 
 ---
 
